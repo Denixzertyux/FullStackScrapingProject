@@ -1,0 +1,83 @@
+<div class="container mt-5">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Autobrand Dashboard</h2>
+  </div>
+
+  <div class="card mb-4 shadow-sm">
+    <div class="card-header bg-light">
+      <h5 class="card-title mb-0">Procesare Factură PDF (#2)</h5>
+    </div>
+    <div class="card-body d-flex align-items-center gap-3">
+      <input type="file" class="form-control w-50" accept="application/pdf" (change)="onFileSelected($event)">
+      <button class="btn btn-primary" [disabled]="!selectedFile || isUploading" (click)="uploadPdf()">
+        <span *ngIf="isUploading" class="spinner-border spinner-border-sm me-2"></span>
+        Încarcă și Extrage CSV
+      </button>
+    </div>
+  </div>
+
+  <div class="card mb-4 shadow-sm">
+    <div class="card-body d-flex gap-3 align-items-center">
+      <input type="text" class="form-control w-50" placeholder="Caută produs după denumire..." [(ngModel)]="searchTerm" (keyup.enter)="onSearch()">
+      <button class="btn btn-outline-secondary" (click)="onSearch()">Caută</button>
+    </div>
+  </div>
+
+  <div class="table-responsive shadow-sm">
+    <table class="table table-hover table-bordered mb-0 align-middle">
+      <thead class="table-dark">
+        <tr>
+          <th scope="col" class="text-center">Imagine</th>
+          <th scope="col">Denumire Produs</th>
+          <th scope="col">Preț Brut</th>
+          <th scope="col">Preț RON (Convertit)</th>
+          <th scope="col" class="text-center">Acțiuni</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let product of products">
+          
+          <ng-container *ngIf="editingProductId !== product.id">
+            <td class="text-center">
+              <img *ngIf="product.imageUrl" [src]="product.imageUrl" alt="Produs" width="50" class="img-thumbnail">
+            </td>
+            <td>{{ product.name }}</td>
+            <td>{{ product.originalPrice }}</td>
+            <td><strong>{{ product.priceRon }} RON</strong></td>
+            <td class="text-center">
+              <button class="btn btn-sm btn-warning me-2" (click)="startEditing(product)">Editează</button>
+              <button class="btn btn-sm btn-danger" (click)="deleteProduct(product.id)">Șterge</button>
+            </td>
+          </ng-container>
+
+          <ng-container *ngIf="editingProductId === product.id">
+            <td class="text-center">
+              <img *ngIf="product.imageUrl" [src]="product.imageUrl" alt="Produs" width="50" class="img-thumbnail opacity-50">
+            </td>
+            <td>
+              <input type="text" class="form-control form-control-sm" [(ngModel)]="editedProduct.name">
+            </td>
+            <td>
+              <input type="text" class="form-control form-control-sm" [(ngModel)]="editedProduct.originalPrice">
+            </td>
+            <td>
+              <div class="input-group input-group-sm">
+                <input type="number" class="form-control" [(ngModel)]="editedProduct.priceRon">
+                <span class="input-group-text">RON</span>
+              </div>
+            </td>
+            <td class="text-center">
+              <button class="btn btn-sm btn-success me-2" (click)="saveEdit()">Salvează</button>
+              <button class="btn btn-sm btn-secondary" (click)="cancelEditing()">Anulează</button>
+            </td>
+          </ng-container>
+
+        </tr>
+
+        <tr *ngIf="products.length === 0">
+          <td colspan="5" class="text-center text-muted py-4">Nu au fost găsite produse. Așteptăm ca task-ul de Scraping să se execute sau ajustează filtrul.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
